@@ -1,0 +1,202 @@
+<html>
+
+<head>
+    <title>Sigv4 Tool | ritish@</title>
+    <link rel="icon" type="image/ico" href="download.ico">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="icon" type="image/ico" href="favicon.ico">
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/underscore-min.js"></script>
+    <script src="assets/js/crypto-js.js"></script>
+    <link href="assets/css/app.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-bottom">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Understanding Sigv4</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="mailto:ritish@amazon.com"><span></span>ritish@amazon.com</a></li>
+            </ul>
+        </div>
+    </nav><label>Update Access key, secret key, date, service and region</label><br>
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#additionalDetailsDiv">Add Details
+        <span class="caret"></span>
+    </button>
+    <br />
+    <div id="additionalDetailsDiv" class="collapse">
+        <div class="field-group row">
+            <br />
+            <input type="text" class="field-value form-control col-sm-4" id="accessKey" name="accessKey" value="AKIDEXAMPLE" placeholder="Access Key"></input>
+            <input class="field-value form-control col-sm-4" id="secretKey" name="secretKey" value="wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY" placeholder="Secret Key"></input>
+            <input class="field-value form-control col-sm-4" id="region" name="region" value="region" placeholder="Region"></input>
+            <input class="field-value form-control col-sm-4" id="service" name="service" value="service" placeholder="Service"></input>
+            <input class="field-value form-control col-sm-4" id="date" name="date" placeholder="Date"></input><span id ="ChangeDate" class="glyphicon glyphicon-refresh" data-placement="auto" data-toggle="tooltip" title="Refresh Date"></span>
+        </div>
+    </div>
+    <br />
+    <div class="requestContainer">
+        <div class="form-group">
+            <select class="form-control requestMethod" id="requestMethod">
+                <option>GET</option>
+                <option>PUT</option>
+                <option>POST</option>
+                <option>DELETE</option>
+            </select>
+        </div>
+        <input type="text" class="form-control requestURL" id="requestURL" name="requestURL" placeholder="https://bucketname.s3.amazonaws.com/object.ext?param1=value1&param2=value2" value="https://bucketname.s3.amazonaws.com/object.ext?param1=value1&param2=value2">
+        <!--         <button id="ChangeDate" class="requestMethod btn btn-primary dropdown-toggle" type="button" data-placement="auto" data-toggle="tooltip" title="Take system date and calculate the signature">Calculate Signature using system date</button> -->
+        <button id="changeCRBtn" class="requestMethod btn btn-primary dropdown-toggle" type="button" data-placement="auto" data-toggle="tooltip" title="Take date provided above and calculate the signature">Calculate Signature</button>
+    </div>
+    <br />
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#requestHeaderAndBodyDiv">Add Headers and Body
+        <span class="caret"></span>
+    </button>
+    <label><input type="checkbox" checked id="add-x-amz-content-sha256-header" value=""> Add x-amz-content-sha256 header?</label>
+    <br />
+    <div id="requestHeaderAndBodyDiv" class="collapse">
+        <div class="form-group">
+            <label for="comment">Request Headers </label>
+            <textarea class="form-control" rows="5" id="requestHeaders" placeholder='header1:value1&#10;header2:value2&#10;header3:value3&#10;&#10;Ensure that the cursor is not in the next line!'></textarea>
+        </div>
+        <div class="form-group">
+            <label for="comment">Request Body</label>
+            <textarea class="form-control" rows="5" id="requestBody" placeholder="Hello world !!"></textarea>
+        </div>
+    </div>
+    <br />
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#CRDiv">Canonical Request:
+        <span class="caret"></span>
+    </button>
+    <br />
+    <div id="CRDiv" class="collapse in">
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Request Method <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-requestmethod" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Canonical URI <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-canonicaluri" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Canonical Query String <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-canonicalqs" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Canonical Headers <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <textarea rows="6" class="field-value form-control col-sm-9" rows="5" id="cr-canonicalheaders" value="GET" disabled></textarea>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Signed Headers <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-signedheaders" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">RequestPayload <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-requestpayload" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Canonical Request <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <textarea rows="11" class="field-value form-control col-sm-9" rows="5" id="cr-cr" value="GET" disabled></textarea>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">HashedCanocialRequest <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="cr-sts-hashedcr" value="GET" disabled></input>
+        </div>
+    </div>
+    <br />
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#STSDiv">String to Sign:
+        <span class="caret"></span>
+    </button>
+    <br />
+    <div id="STSDiv" class="collapse in">
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Algorithm<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="sts-algorithm" value="AWS4-HMAC-SHA256" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">RequestDateTime<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="sts-requestdatetime" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">CredentialScope <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="sts-credentialscope" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">HashedCanocialRequest <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="sts-hashedcr" value="GET" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">String To Sign <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <textarea rows="4" class="field-value form-control col-sm-9" rows="5" id="sts-sts" value="GET" disabled></textarea>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">Hashed String To Sign<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="sts-hashedsts" value="GET" disabled></input>
+        </div>
+    </div>
+    <br />
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#SKDiv">Signing Key:
+        <span class="caret"></span>
+    </button>
+    <div id="SKDiv" class="collapse in">
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">kSecret <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="kSecret" value="Secretkey" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">kDate <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="kDate" value="Secretkey" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">kRegion <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="kRegion" value="Secretkey" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">kService<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="kService" value="Secretkey" disabled></input>
+        </div>
+        <div class="field-group row">
+            <label for="comment" class="field-label col-sm-3">kSigning<span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+            <input class="field-value form-control col-sm-9" rows="5" id="kSigning" value="Secretkey" disabled></input>
+        </div>
+        <br />
+    </div>
+    <div class="field-group row">
+        <label for="comment" class="field-label col-sm-3" id="signatureLabel">Signature <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+        <input class="field-value form-control col-sm-9" rows="5" id="signature" value="Secretkeys" disabled></input>
+    </div>
+    <div class="field-group row">
+        <label for="comment" class="field-label col-sm-3" id="signatureLabel">Authorization Header <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+        <textarea class="field-value form-control col-sm-9" rows="2" cols="20" wrap="hard" id="auth-header" value="Secretkeys" disabled></textarea>
+    </div>
+    <div class="field-group row">
+        <label for="comment" class="field-label col-sm-3" id="signatureLabel">cURL command: <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#myModal"></span></label>
+        <textarea class="field-value form-control col-sm-9" rows="6" cols="20" wrap="hard" id="curl-command" value="Secretkeys" disabled></textarea>
+    </div>
+    <h3></h3><br>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="assets/js/app.js"></script>
+
+</html>
