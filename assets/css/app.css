@@ -1,0 +1,34 @@
+input {
+    word-wrap: normal;
+}
+
+.requestURL {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.requestContainer {
+    display: flex;
+}
+
+body {
+    padding: 20px;
+}
+
+.field-group {
+    display: flex;
+    padding: 5px;
+}
+
+.field-value {
+    cursor: text !important;
+    margin-right: 3px
+}
+
+#signatureLabel {
+    color: green;
+}
+
+.tooltip {
+    white-space: pre-line !important;
+}
